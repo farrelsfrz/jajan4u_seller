@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./App.css";
 import smkn4Logo from "./assets/smkn4.png";
 import eyeIcon from "./assets/eye.png";
 import showIcon from "./assets/show.png";
-import Loading from "./loadingpage"; // Pastikan file ini ada
+import Loading from "./loadingpage"; 
 
 const App: React.FC = () => {
   const [nis, setNis] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(true); // Set awal loading true
+  const [loading, setLoading] = useState(true); 
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  // Efek loading saat pertama kali buka halaman (2 detik)
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
@@ -23,7 +21,7 @@ const App: React.FC = () => {
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true); // Tampilkan loading saat login
+    setLoading(true); 
 
     try {
       const response = await axios.post("https://87f0-114-10-148-241.ngrok-free.app/users", {
@@ -40,13 +38,13 @@ const App: React.FC = () => {
     } catch (error) {
       setErrorMessage("Terjadi kesalahan. Coba lagi.");
     } finally {
-      setLoading(false); // Matikan loading setelah login selesai
+      setLoading(false); 
     }
   };
 
   return (
     <div style={styles.container}>
-      {loading && <Loading />} {/* Loading tampil saat pertama kali buka atau login */}
+      {loading && <Loading />} {}
       {!loading && (
         <>
           <nav style={styles.navbar}>
@@ -78,7 +76,7 @@ const App: React.FC = () => {
                       required
                     />
                     <img
-                      src={showPassword ? eyeIcon : showIcon}
+                      src={showPassword ? showIcon : eyeIcon}
                       alt="Toggle Password"
                       style={styles.eyeIcon}
                       onClick={() => setShowPassword(!showPassword)}

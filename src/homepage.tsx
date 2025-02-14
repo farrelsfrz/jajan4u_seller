@@ -1,249 +1,229 @@
-import React, { useState, useEffect } from "react";
-import { IoHome } from "react-icons/io5";
-import { FiMessageSquare } from "react-icons/fi";
-import { IoCartOutline } from "react-icons/io5";
-import { MdHistory } from "react-icons/md";
-import { CgProfile } from "react-icons/cg";
-import Loading from "./loadingpage";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
-import "./homepage.css";
-import logo from "./assets/4 - Copy.png";
-import menuIcon from "./assets/menu.png";
-import searchIcon from "./assets/search.png";
-import avatar1 from "./assets/ayam.jpg";
-import avatar2 from "./assets/donat.jpg";
-import avatar3 from "./assets/martabak.jpg";
-import avatar4 from "./assets/oreo.jpg";
-import avatar5 from "./assets/risol.jpg";
-import koperasi from "./assets/koperasi.jpeg";
-import kantin from "./assets/kantin.jpg";
-import hydro from "./assets/galon.jpeg";
+import React from 'react';
+import { IoAnalytics } from 'react-icons/io5';
+import { FiClipboard } from 'react-icons/fi';
+import { CgProfile } from 'react-icons/cg';
+import { GiReceiveMoney } from 'react-icons/gi';
+import { BiFoodMenu } from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
+import { Switch } from '@headlessui/react';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
-interface ProfileCardProps {
-  onClose: () => void;
-}
-
-interface HistoryCardProps {
-  onClose: () => void;
-}
-
-const Homepage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const navigate = useNavigate();  // Initialize useNavigate
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSearchKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      alert(`Searching for: ${searchQuery}`);
-    }
-  };
-
-  const toggleProfilePopup = () => {
-    setIsProfileOpen(!isProfileOpen);
-  };
-
-  const toggleHistoryPopup = () => {
-    setIsHistoryOpen(!isHistoryOpen);
-  };
-
-  const navigateToMsgPage = () => {
-    navigate("/msgpage");  
-  };
-
-  const navigateToKantin = () => {
-    navigate("/kantin");  // Pastikan path sesuai dengan route
-  };
-
-  const navigateToCart = () => {
-    navigate("/keranjang");
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = React.useState(true);
+  const [isDeliveryEnabled, setIsDeliveryEnabled] = React.useState(true);
+  const [showProfile, setShowProfile] = React.useState(false);
 
   return (
-    <div className="homepage">
-      <header className="header">
-        <div className="logo">
-          <img src={logo} alt="SuperMarket Logo" className="logo-image" />
-        </div>
-        <nav className="navbar">
-          <form className="search-form">
-            <img src={menuIcon} alt="Menu Icon" className="menu-icon" />
-            <input
-              type="text"
-              placeholder="Jajan apa hari ini?"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onKeyDown={handleSearchKeyDown}
-              className="search-input"
-            />
-            <img src={searchIcon} alt="Search Icon" className="search-icon" />
-          </form>
-        </nav>
-      </header>
+    <div className="flex flex-col min-h-screen bg-gray-100 relative overflow-x-hidden">
+      {/* Header */}
+      <div className="bg-white p-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <button 
+              className="p-2 hover:bg-gray-100 rounded-full"
+              onClick={() => setShowProfile(true)}
+            >
+              <CgProfile className="text-2xl text-gray-700" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold">Hallo Sultan</h1>
+              <p className="text-gray-500">Toko Bayu, Tokyo</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            {/* Delivery Switch */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Antar</span>
+              <Switch
+                checked={isDeliveryEnabled}
+                onChange={setIsDeliveryEnabled}
+                className={`${
+                  isDeliveryEnabled ? 'bg-[#4CD964]' : 'bg-gray-200'
+                } relative inline-flex h-8 w-20 items-center rounded-full transition-colors focus:outline-none`}
+              >
+                <span className="sr-only">Toggle delivery status</span>
+                <span
+                  className={`
+                    ${isDeliveryEnabled ? 'translate-x-12' : 'translate-x-1'}
+                    inline-block h-6 w-6 transform rounded-full bg-white transition-transform
+                  `}
+                />
+                <span 
+                  className={`
+                    absolute text-xs font-medium
+                    ${isDeliveryEnabled ? 'left-3 text-white' : 'right-3 text-white'}
+                  `}
+                >
+                  {isDeliveryEnabled ? 'Aktif' : 'Mati'}
+                </span>
+              </Switch>
+            </div>
 
-      <div className="saldo-card">
-        <div className="led-text">Selamat Datang di Jajan4U!</div>
+            {/* Store Status Switch */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Toko</span>
+              <Switch
+                checked={isOpen}
+                onChange={setIsOpen}
+                className={`${
+                  isOpen ? 'bg-[#4CD964]' : 'bg-red-500'
+                } relative inline-flex h-8 w-20 items-center rounded-full transition-colors focus:outline-none`}
+              >
+                <span className="sr-only">Toggle store status</span>
+                <span
+                  className={`
+                    ${isOpen ? 'translate-x-12' : 'translate-x-1'}
+                    inline-block h-6 w-6 transform rounded-full bg-white transition-transform
+                  `}
+                />
+                <span 
+                  className={`
+                    absolute text-xs font-medium
+                    ${isOpen ? 'left-3 text-white' : 'right-3 text-white'}
+                  `}
+                >
+                  {isOpen ? 'Buka' : 'Tutup'}
+                </span>
+              </Switch>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="avatar-container">
-        <div className="avatar">
-          <img src={avatar1} alt="Avatar 1" />
-          <div className="avatar-hover-text">Burger</div>
-        </div>
-        <div className="avatar">
-          <img src={avatar2} alt="Avatar 2" />
-          <div className="avatar-hover-text">Pizza</div>
-        </div>
-        <div className="avatar">
-          <img src={avatar3} alt="Avatar 3" />
-          <div className="avatar-hover-text">Sushi</div>
-        </div>
-        <div className="avatar">
-          <img src={avatar4} alt="Avatar 4" />
-          <div className="avatar-hover-text">Pasta</div>
-        </div>
-        <div className="avatar">
-          <img src={avatar5} alt="Avatar 5" />
-          <div className="avatar-hover-text">Salad</div>
+      {/* Menu Icons Section */}
+      <div className="grid grid-cols-4 gap-4 p-4 bg-white rounded-lg shadow-sm mx-4 mt-4">
+        <MenuItem 
+          icon={<FiClipboard />} 
+          label="Pesanan" 
+          onClick={() => navigate('/pesanan')}
+        />
+        <MenuItem 
+          icon={<BiFoodMenu />} 
+          label="Menu" 
+          onClick={() => navigate('/menu')}
+        />
+        <MenuItem 
+          icon={<GiReceiveMoney />} 
+          label="Keuangan" 
+          onClick={() => navigate('/keuangan')}
+        />
+        <MenuItem 
+          icon={<IoAnalytics />} 
+          label="Analisis"
+          onClick={() => navigate('/analisis')} 
+        />
+      </div>
+
+      {/* Setup Menu Section */}
+      <div className="bg-white rounded-lg shadow-sm mx-4 mt-4 p-4 hover:shadow-md transition-shadow duration-200">
+        <div 
+          className="flex items-center space-x-3 cursor-pointer group px-2"
+          onClick={() => navigate('/setupmenu')}
+        >
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white transform transition-all duration-200 group-hover:scale-105 group-hover:shadow-md group-hover:from-[#FFD700] group-hover:to-[#FFB700]">
+            <BiFoodMenu className="text-xl" />
+          </div>
+          <div className="flex-1">
+            <h2 className="font-semibold group-hover:text-[#FFD700] transition-colors duration-200">Tambah Menu</h2>
+            <p className="text-sm text-gray-500">Atur menu Anda di sini</p>
+          </div>
         </div>
       </div>
 
-      <div className="additional-cards">
-        <div className="card">
-          <img src={koperasi} alt="Koperasi" className="card-image" />
-          <h3>Koperasi</h3>
-          <p>ATK, makanan, minuman, dll.</p>
-        </div>
-        <div className="card" onClick={navigateToKantin} style={{ cursor: 'pointer' }}>
-          <img src={kantin} alt="Kantin" className="card-image" />
-          <h3>Kantin</h3>
-          <p>Makanan, minuman, dll.</p>
-        </div>
-        <div className="card">
-          <img src={hydro} alt="Camilan" className="card-image" />
-          <h3>Hydro4</h3>
-          <p>Isi ulang galon</p>
-        </div>
-      </div>
+      {/* Profile Popup */}
+      {showProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+          <div className="absolute left-0 top-0 bottom-0 w-full max-w-md bg-[#F6F6F6] flex flex-col animate-slide-right">
+            {/* Profile Header */}
+            <div className="bg-white px-4 py-3 flex items-center space-x-4 sticky top-0 z-10 shadow-sm">
+              <button 
+                onClick={() => setShowProfile(false)}
+                className="p-1 hover:bg-gray-100 rounded-full"
+              >
+                <IoIosArrowBack className="text-2xl text-gray-700" />
+              </button>
+              <h1 className="text-lg font-medium">Personal Profile</h1>
+            </div>
 
-      <div className="new-card">
-        <h3>
-          <IoHome />
-          <FiMessageSquare onClick={navigateToMsgPage} style={{ cursor: "pointer" }} />
-          <IoCartOutline onClick={navigateToCart} style={{ cursor: "pointer" }} />
-          <MdHistory onClick={toggleHistoryPopup} style={{ cursor: "pointer" }} />
-          <CgProfile onClick={toggleProfilePopup} style={{ cursor: "pointer" }} />
-        </h3>
-      </div>
+            {/* Profile Content - Scrollable Area */}
+            <div className="flex-1 overflow-y-auto scrollbar-hide">
+              <div className="p-4 space-y-6">
+                {/* Personal Info Section */}
+                <div>
+                  <h2 className="text-[13px] font-medium text-gray-900 mb-3">Personal Info</h2>
+                  <div className="bg-white rounded-xl divide-y divide-gray-100">
+                    <div className="px-4 py-3.5">
+                      <p className="text-xs text-gray-400">Name</p>
+                      <p className="text-[13px] text-gray-900 mt-0.5">sultanbayu123@gmail.com</p>
+                    </div>
+                    <div className="px-4 py-3.5">
+                      <p className="text-xs text-gray-400">Username</p>
+                      <p className="text-[13px] text-gray-900 mt-0.5">sultanbayu123@gmail.com</p>
+                    </div>
+                    <div className="px-4 py-3.5">
+                      <p className="text-xs text-gray-400">Role</p>
+                      <p className="text-[13px] text-gray-900 mt-0.5">Admin</p>
+                    </div>
+                  </div>
+                </div>
 
-      {isProfileOpen && (
-        <ProfileCard onClose={toggleProfilePopup} />
+                {/* Contact Info Section */}
+                <div>
+                  <h2 className="text-[13px] font-medium text-gray-900 mb-3">Contact Info</h2>
+                  <div className="bg-white rounded-xl overflow-hidden">
+                    <div className="divide-y divide-gray-100">
+                      <div className="px-4 py-3.5 flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-400">Email</p>
+                          <p className="text-[13px] text-gray-900 mt-0.5 truncate pr-4">sultanbayu123@gmail.com</p>
+                        </div>
+                        <IoIosArrowForward className="text-gray-400 flex-shrink-0" />
+                      </div>
+                      <div className="px-4 py-3.5 flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-400">Number</p>
+                          <p className="text-[13px] text-gray-900 mt-0.5 truncate pr-4">+62 822-5544-8877</p>
+                        </div>
+                        <IoIosArrowForward className="text-gray-400 flex-shrink-0" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2.5 pt-4 pb-6">
+                  <button className="w-full bg-red-500 text-white py-3 rounded-xl font-medium text-sm hover:bg-red-600 transition-colors">
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
-
-      {isHistoryOpen && (
-        <HistoryCard onClose={toggleHistoryPopup} />
-      )}
     </div>
   );
 };
 
-const ProfileCard = ({ onClose }: ProfileCardProps) => {
+// Menu Item Component
+const MenuItem: React.FC<{ 
+  icon: React.ReactNode; 
+  label: string;
+  onClick?: () => void;
+}> = ({ icon, label, onClick }) => {
   return (
-    <div className="profile-card">
-      <div className="profile-header">
-        <div className="profile-pic">
-          {/* Icon user */}
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-        </div>
-        <span>Profile</span>
-        <button className="close-btn" onClick={onClose}>×</button>
+    <div 
+      className="flex flex-col items-center justify-center p-3 cursor-pointer group" 
+      onClick={onClick}
+    >
+      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-2xl mb-2 shadow-md transform transition-all duration-200 group-hover:shadow-lg group-hover:scale-105 group-hover:from-[#FFD700] group-hover:to-[#FFB700]">
+        {icon}
       </div>
-
-      <div className="profile-content">
-        <div className="profile-item">
-          <span className="profile-label">Nama lengkap</span>
-          <span className="profile-value">Raka Pratama Domingoz</span>
-        </div>
-
-        <div className="profile-item">
-          <span className="profile-label">Nomor ponsel</span>
-          <span className="profile-value">(+62) 12345678</span>
-        </div>
-
-        <div className="profile-item">
-          <span className="profile-label">NIS</span>
-          <span className="profile-value">2223119599</span>
-        </div>
-
-        <div className="profile-item">
-          <span className="profile-label">Alamat email</span>
-          <span className="profile-value">rakaprtmd@example.com</span>
-        </div>
-
-        <div className="profile-item">
-          <span className="profile-label">Jenis kelamin</span>
-          <span className="profile-value">Laki-laki</span>
-        </div>
-
-        <button className="sign-out-btn">Sign Out</button>
-      </div>
+      <span className="text-sm font-medium text-gray-700 group-hover:text-[#FFD700] transition-colors duration-200">{label}</span>
     </div>
   );
 };
 
-const HistoryCard = ({ onClose }: HistoryCardProps) => {
-  return (
-    <div className="history-card">
-      <div className="history-header">
-        <div className="history-icon">
-          <MdHistory />
-        </div>
-        <span>Aktifitas</span>
-        <button className="close-btn" onClick={onClose}>×</button>
-      </div>
-
-      <div className="history-content">
-        <div className="history-item">
-          <div className="history-item-icon">
-            <img src={avatar1} alt="Kantin" />
-          </div>
-          <div className="history-details">
-            <div className="history-title">Kantin Op4t - Burger Burgar</div>
-            <div className="history-date">17 Januari 2025, 10:05</div>
-          </div>
-          <div className="history-amount">1 x Rp. 30.000</div>
-        </div>
-
-        <div className="history-item">
-          <div className="history-item-icon">
-            <img src={avatar5} alt="Koperasi" />
-          </div>
-          <div className="history-details">
-            <div className="history-title">Koperasi Op4t - Risoles Mamayo</div>
-            <div className="history-date">17 Januari 2025, 10:25</div>
-          </div>
-          <div className="history-amount">1 x Rp. 5.000</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Homepage;
+export default HomePage;
