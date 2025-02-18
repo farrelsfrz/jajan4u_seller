@@ -7,7 +7,7 @@ import showIcon from "./assets/show.png";
 import Loading from "./loadingpage"; 
 
 const App: React.FC = () => {
-  const [nis, setNis] = useState("");
+  const [contact_info, setContactInfo] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true); 
@@ -24,21 +24,24 @@ const App: React.FC = () => {
     setLoading(true); 
 
     try {
-      const response = await axios.post("https://87f0-114-10-148-241.ngrok-free.app/users", {
-        nis,
-        password,
+      const response = await axios.get("https://d006-114-10-45-252.ngrok-free.app/users", {
+        params: {
+          contact_info,
+          password,
+        }
       });
 
-      if (response.data) {
-        localStorage.setItem("user", JSON.stringify(response.data));
+      if (response.data && response.data.length > 0) {
+        localStorage.setItem("user", JSON.stringify(response.data[0]));
         navigate("/homepage");
       } else {
-        setErrorMessage("Login gagal. Periksa NIS/NIP & password.");
+        setErrorMessage("Login gagal. Periksa Contact Info & password.");
       }
     } catch (error) {
+      console.error('Error during login:', error);
       setErrorMessage("Terjadi kesalahan. Coba lagi.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -58,10 +61,10 @@ const App: React.FC = () => {
                 <div style={styles.inputGroup}>
                   <input
                     type="text"
-                    placeholder="NIS/NIP"
+                    placeholder="Contact Info"
                     style={styles.input}
-                    value={nis}
-                    onChange={(e) => setNis(e.target.value)}
+                    value={contact_info}
+                    onChange={(e) => setContactInfo(e.target.value)}
                     required
                   />
                 </div>
