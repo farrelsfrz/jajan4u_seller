@@ -14,6 +14,11 @@ const HomePage: React.FC = () => {
   const [isDeliveryEnabled, setIsDeliveryEnabled] = React.useState(true);
   const [showProfile, setShowProfile] = React.useState(false);
 
+  const handleLogout = () => {
+    // Perform any logout logic here (e.g., clearing tokens, etc.)
+    navigate('/');
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 relative overflow-x-hidden">
       {/* Header */}
@@ -26,10 +31,6 @@ const HomePage: React.FC = () => {
             >
               <CgProfile className="text-2xl text-gray-700" />
             </button>
-            <div>
-              <h1 className="text-2xl font-bold">Hallo Sultan</h1>
-              <p className="text-gray-500">Toko Bayu, Tokyo</p>
-            </div>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -156,15 +157,11 @@ const HomePage: React.FC = () => {
                   <div className="bg-white rounded-xl divide-y divide-gray-100">
                     <div className="px-4 py-3.5">
                       <p className="text-xs text-gray-400">Name</p>
-                      <p className="text-[13px] text-gray-900 mt-0.5">sultanbayu123@gmail.com</p>
+                      <p className="text-[13px] text-gray-900 mt-0.5">Nama Penjual</p>
                     </div>
                     <div className="px-4 py-3.5">
-                      <p className="text-xs text-gray-400">Username</p>
-                      <p className="text-[13px] text-gray-900 mt-0.5">sultanbayu123@gmail.com</p>
-                    </div>
-                    <div className="px-4 py-3.5">
-                      <p className="text-xs text-gray-400">Role</p>
-                      <p className="text-[13px] text-gray-900 mt-0.5">Admin</p>
+                      <p className="text-xs text-gray-400">Toko</p>
+                      <p className="text-[13px] text-gray-900 mt-0.5">Nama Toko</p>
                     </div>
                   </div>
                 </div>
@@ -177,14 +174,14 @@ const HomePage: React.FC = () => {
                       <div className="px-4 py-3.5 flex items-center justify-between">
                         <div className="flex-1">
                           <p className="text-xs text-gray-400">Email</p>
-                          <p className="text-[13px] text-gray-900 mt-0.5 truncate pr-4">sultanbayu123@gmail.com</p>
+                          <p className="text-[13px] text-gray-900 mt-0.5 truncate pr-4">EmailPenjual@example.com</p>
                         </div>
                         <IoIosArrowForward className="text-gray-400 flex-shrink-0" />
                       </div>
                       <div className="px-4 py-3.5 flex items-center justify-between">
                         <div className="flex-1">
                           <p className="text-xs text-gray-400">Number</p>
-                          <p className="text-[13px] text-gray-900 mt-0.5 truncate pr-4">+62 822-5544-8877</p>
+                          <p className="text-[13px] text-gray-900 mt-0.5 truncate pr-4">Nomor penjual</p>
                         </div>
                         <IoIosArrowForward className="text-gray-400 flex-shrink-0" />
                       </div>
@@ -194,7 +191,10 @@ const HomePage: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="space-y-2.5 pt-4 pb-6">
-                  <button className="w-full bg-red-500 text-white py-3 rounded-xl font-medium text-sm hover:bg-red-600 transition-colors">
+                  <button 
+                    className="w-full bg-red-500 text-white py-3 rounded-xl font-medium text-sm hover:bg-red-600 transition-colors"
+                    onClick={handleLogout}
+                  >
                     Logout
                   </button>
                 </div>

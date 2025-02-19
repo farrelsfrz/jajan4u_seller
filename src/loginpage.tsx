@@ -5,6 +5,16 @@ import smkn4Logo from "./assets/smkn4.png";
 import eyeIcon from "./assets/eye.png";
 import showIcon from "./assets/show.png";
 import Loading from "./loadingpage"; 
+import bcrypt from 'bcryptjs';
+
+// Tambahkan interface untuk Seller
+interface Seller {
+  contact_info: string;
+  password: string;
+  seller_id: string;
+  token: string;
+  // Tambahkan properti lain yang ada dalam objek seller
+}
 
 const App: React.FC = () => {
   const [contact_info, setContactInfo] = useState("");
@@ -21,30 +31,46 @@ const App: React.FC = () => {
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true); 
-
+    setLoading(true);
+  
     try {
-      const response = await axios.get("https://d006-114-10-45-252.ngrok-free.app/users", {
+      const response = await axios.get("https://d006-114-10-45-252.ngrok-free.app/data_sellers", {
         params: {
-          contact_info,
-          password,
+          contact_info
         }
       });
-
+  
+      console.log("Contact Info:", contact_info);
+      console.log("Response Data:", response.data);
+  
       if (response.data && response.data.length > 0) {
-        localStorage.setItem("user", JSON.stringify(response.data[0]));
-        localStorage.setItem("user_id", response.data[0].id); // Simpan user_id ke localStorage
-        navigate("/homepage"); // Arahkan ke halaman beranda
+        const seller = response.data.find((s: Seller) => s.contact_info === contact_info);
+        
+        if (seller) {
+          const isMatch = await bcrypt.compare(password, seller.password); // Bandingkan password
+  
+          if (isMatch) {
+            localStorage.setItem("seller", JSON.stringify(seller));
+            localStorage.setItem("seller_id", seller.seller_id);
+            localStorage.setItem("token", seller.token);
+            navigate("/homepage");
+          } else {
+            setErrorMessage("Login gagal. Periksa Contact Info & password.");
+          }
+        } else {
+          setErrorMessage("Login gagal. Periksa Contact Info & password.");
+        }
       } else {
         setErrorMessage("Login gagal. Periksa Contact Info & password.");
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error("Error during login:", error);
       setErrorMessage("Terjadi kesalahan. Coba lagi.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div style={styles.container}>
@@ -62,7 +88,7 @@ const App: React.FC = () => {
                 <div style={styles.inputGroup}>
                   <input
                     type="text"
-                    placeholder="Contact Info"
+                    placeholder="Username"
                     style={styles.input}
                     value={contact_info}
                     onChange={(e) => setContactInfo(e.target.value)}
