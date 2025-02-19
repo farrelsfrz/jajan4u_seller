@@ -9,16 +9,19 @@ const Loading: React.FC = () => {
     const timer = setTimeout(() => {
       setFadeOut(true);
     }, 1000); // Durasi loading 1 detik
-    return () => clearTimeout(timer); // Membersihkan timer jika komponen di-unmount
+
+    return () => {
+      clearTimeout(timer); // Membersihkan timer jika komponen di-unmount
+    };
   }, []);
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container as React.CSSProperties}>
       <img
         src={loadingImage}
         alt="Loading"
         style={{
-          ...styles.image,
+          ...styles.image as React.CSSProperties,
           opacity: fadeOut ? 0 : 1, // Mengatur opasitas untuk fade-out
           transition: 'opacity 1s ease-out', // Menambahkan transisi pada opasitas
         }}
@@ -29,7 +32,7 @@ const Loading: React.FC = () => {
 
 const styles = {
   container: {
-    position: 'fixed', 
+    position: 'fixed' as const, 
     top: 0,
     left: 0,
     width: '100vw',
@@ -45,7 +48,7 @@ const styles = {
     height: '400px', 
     animation: 'rotate 2s linear infinite', 
   },
-};
+} as const;
 
 
 const styleSheet = document.styleSheets[0];

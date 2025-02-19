@@ -33,7 +33,8 @@ const App: React.FC = () => {
 
       if (response.data && response.data.length > 0) {
         localStorage.setItem("user", JSON.stringify(response.data[0]));
-        navigate("/homepage");
+        localStorage.setItem("user_id", response.data[0].id); // Simpan user_id ke localStorage
+        navigate("/homepage"); // Arahkan ke halaman beranda
       } else {
         setErrorMessage("Login gagal. Periksa Contact Info & password.");
       }

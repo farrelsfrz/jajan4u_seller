@@ -6,7 +6,7 @@ import axios from 'axios';
 
 // Konfigurasi axios dengan URL ngrok
 const api = axios.create({
-  baseURL: 'https://b08c-103-151-226-8.ngrok-free.app',
+  baseURL: 'https://d006-114-10-45-252.ngrok-free.app',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -30,12 +30,18 @@ const MenuPage: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchMenuItems();
+    const userId = localStorage.getItem("user_id");
+    if (userId) {
+      fetchMenuItems(userId);
+    } else {
+      setError("User ID tidak ditemukan. Silakan login kembali.");
+      setLoading(false);
+    }
   }, []);
 
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = async (userId: string) => {
     try {
-      const response = await api.get('/menu/1', {
+      const response = await api.get(`/menu/${userId}`, {
         headers: {
           'ngrok-skip-browser-warning': 'true'
         }

@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 import axios from 'axios';
 
-// Konfigurasi axios tanpa baseURL
 const api = axios.create({
+  baseURL: 'https://d006-114-10-45-252.ngrok-free.app',
   headers: {
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'ngrok-skip-browser-warning': 'true'
   }
 });
 
@@ -37,7 +38,7 @@ const SetupMenuPage: React.FC = () => {
       }
 
       await api.post('/api/menu', formData, {
-        headers: {
+        headers: {  
           'Content-Type': 'multipart/form-data'
         }
       });
