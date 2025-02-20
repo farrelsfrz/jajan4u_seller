@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
       console.log("Seller ID:", sellerId);
 
       try {
-        const response = await axios.get(`https://d006-114-10-45-252.ngrok-free.app/data_sellers/${sellerId}`, {
+        const response = await axios.get(`https://93d2-114-10-147-236.ngrok-free.app/data_sellers/${sellerId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

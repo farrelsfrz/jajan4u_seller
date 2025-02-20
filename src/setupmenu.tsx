@@ -5,7 +5,7 @@ import { BsImage } from 'react-icons/bs';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://d006-114-10-45-252.ngrok-free.app',
+  baseURL: 'https://93d2-114-10-147-236.ngrok-free.app',
   headers: {
     'Accept': 'application/json',
     'ngrok-skip-browser-warning': 'true'
@@ -99,7 +99,7 @@ const SetupMenuPage: React.FC = () => {
           <label htmlFor="image-upload" className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center space-y-2 hover:border-blue-500 transition-colors cursor-pointer">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
               <BsImage className="text-3xl text-gray-400" />
-            </div>
+            </div>  
             <p className="text-sm text-gray-500">Upload foto menu (max 1MB)</p>
           </label>
         </div>

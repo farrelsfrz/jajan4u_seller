@@ -7,7 +7,6 @@ import SetupMenuPage from './setupmenu';
 import MenuPage from './menu';
 import PesananPage from './pesanan';
 import AnalisisPage from './analisis';
-import EditMenuPage from './editmenu'; // import EditMenuPage
 
 function App() {
   return (
@@ -19,7 +18,6 @@ function App() {
       <Route path="/menu" element={<MenuPage />} />
       <Route path="/pesanan" element={<PesananPage />} />
       <Route path="/analisis" element={<AnalisisPage />} />
-      <Route path="/editmenu/:id" element={<EditMenuPage />} /> {/* Tambahkan rute untuk editmenu */}
     </Routes>
   );
 }
