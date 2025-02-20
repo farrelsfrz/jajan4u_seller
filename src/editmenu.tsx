@@ -56,7 +56,7 @@ const EditMenuPage: React.FC = () => {
     }
     try {
       await api.put(`/${id}`, menuItem);
-      navigate('/'); // Kembali ke halaman utama setelah berhasil menyimpan
+      navigate('/menu'); 
     } catch (err) {
       setError('Gagal menyimpan perubahan. Silakan coba lagi.');
     }
