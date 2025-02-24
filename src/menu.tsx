@@ -5,7 +5,7 @@ import { Switch } from '@headlessui/react';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://93d2-114-10-147-236.ngrok-free.app/menu',
+  baseURL: 'https://384d-114-10-148-128.ngrok-free.app/menu',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
