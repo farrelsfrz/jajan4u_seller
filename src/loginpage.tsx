@@ -34,7 +34,7 @@ const App: React.FC = () => {
     setLoading(true);
   
     try {
-      const response = await axios.get("https://384d-114-10-148-128.ngrok-free.app/data_sellers", {
+      const response = await axios.get("https://e1f9-103-151-226-8.ngrok-free.app/data_sellers", {
         params: {
           contact_info
         }

@@ -1,64 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoIosArrowBack } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { BsImage } from 'react-icons/bs';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://93d2-114-10-147-236.ngrok-free.app',
+  baseURL: 'https://e1f9-103-151-226-8.ngrok-free.app',
   headers: {
     'Accept': 'application/json',
     'ngrok-skip-browser-warning': 'true'
   }
 });
 
-const SetupMenuPage: React.FC = () => {
+interface MenuData {
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  seller_id: string;
+  filter_makan: string;
+}
+
+const SetupMenu: React.FC = () => {
   const navigate = useNavigate();
-  const [menuData, setMenuData] = useState({
+  const [menuData, setMenuData] = useState<MenuData>({
     name: '',
+    price: 0,
     description: '',
-    price: '',
-    image: null as File | null
+    image: '',
+    seller_id: localStorage.getItem('seller_id') || '',
+    filter_makan: '1'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setMenuData(prev => ({
+      ...prev,
+      [name]: name === 'price' ? Number(value) : value
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+    setError('');
+
+    // Validasi data sebelum mengirim
+    if (!menuData.name || !menuData.description || isNaN(menuData.price) || menuData.price <= 0) {
+      setError("Semua kolom harus diisi dengan benar, terutama harga yang harus berupa angka.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const formData = new FormData();
-      formData.append('name', menuData.name);
-      formData.append('description', menuData.description);
-      formData.append('price', menuData.price);
-      formData.append('seller_id', '1');
-      if (menuData.image) {
-        formData.append('image', menuData.image);
+      const response = await api.post('/menu', menuData);
+      
+      if (response.status === 200 || response.status === 201) {
+        alert('Menu berhasil ditambahkan!');
+        navigate('/menu'); // Kembali ke halaman menu
       }
-
-      await api.post('/api/menu', formData, {
-        headers: {  
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      navigate('/menu');
-    } catch (error) {
-      setError('Gagal menyimpan menu. Silakan coba lagi.');
-      console.error('Error saving menu:', error);
+    } catch (err) {
+      console.error('Error adding menu:', err);
+      setError('Gagal menambahkan menu. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.size <= 1024 * 1024) { // Max 1MB
-      setMenuData(prev => ({ ...prev, image: file }));
+  // Preview image
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (menuData.image) {
+      setImagePreview(menuData.image);
     } else {
-      setError('Ukuran gambar maksimal 1MB');
+      setImagePreview(null);
     }
+  }, [menuData.image]);
+
+  const handleFilterChange = (filter: string) => {
+    setMenuData(prev => ({
+      ...prev,
+      filter_makan: filter
+    }));
   };
 
   return (
@@ -77,71 +103,124 @@ const SetupMenuPage: React.FC = () => {
       {/* Form */}
       <form onSubmit={handleSubmit} className="p-4 space-y-4 max-w-xl mx-auto overflow-y-auto scrollbar-hide">
         <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">Kategori Menu *</label>
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => handleFilterChange('1')}
+              className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                menuData.filter_makan === '1'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Makanan
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFilterChange('2')}
+              className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-colors ${
+                menuData.filter_makan === '2'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Minuman
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700">Nama Menu *</label>
           <input 
             type="text" 
+            id="name"
+            name="name"
             value={menuData.name}
-            onChange={(e) => setMenuData(prev => ({ ...prev, name: e.target.value }))}
+            onChange={handleInputChange}
             placeholder="Masukkan nama menu"
             className="w-full p-3.5 rounded-xl border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
             required
           />
         </div>
 
-        <div className="relative">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-            id="image-upload"
-          />
-          <label htmlFor="image-upload" className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center space-y-2 hover:border-blue-500 transition-colors cursor-pointer">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-              <BsImage className="text-3xl text-gray-400" />
-            </div>  
-            <p className="text-sm text-gray-500">Upload foto menu (max 1MB)</p>
-          </label>
-        </div>
-
-        {/* Description */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Deskripsi Menu</label>
-          <textarea 
-            value={menuData.description}
-            onChange={(e) => setMenuData(prev => ({ ...prev, description: e.target.value }))}
-            placeholder="Masukkan deskripsi menu"
-            className="w-full p-3.5 rounded-xl border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm min-h-[120px]"
-          />
-        </div>
-
-        {/* Price */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700">Harga Menu *</label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">Rp</span>
             <input 
-              type="text" 
+              type="number"
+              id="price"
+              name="price"
               value={menuData.price}
-              onChange={(e) => setMenuData(prev => ({ ...prev, price: e.target.value }))}
+              onChange={handleInputChange}
               placeholder="Masukkan harga menu"
               className="w-full p-3.5 pl-10 rounded-xl border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+              required
             />
           </div>
         </div>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">Deskripsi Menu</label>
+          <textarea 
+            id="description"
+            name="description"
+            value={menuData.description}
+            onChange={handleInputChange}
+            placeholder="Masukkan deskripsi menu"
+            className="w-full p-3.5 rounded-xl border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm min-h-[120px]"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">URL Gambar</label>
+          <input 
+            type="text"
+            id="image"
+            name="image"
+            value={menuData.image}
+            onChange={handleInputChange}
+            placeholder="Masukkan URL gambar"
+            className="w-full p-3.5 rounded-xl border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+          />
+        </div>
+
+        {imagePreview && (
+          <div className="relative">
+            <img 
+              src={imagePreview} 
+              alt="Preview" 
+              className="w-32 h-32 object-cover rounded-lg"
+            />
+          </div>
+        )}
+
+        {error && (
+          <p className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">
+            {error}
+          </p>
+        )}
         
-        <button 
-          type="submit" 
-          className="w-full bg-[#4CD964] text-white py-3.5 rounded-xl font-medium mt-6 hover:bg-[#44c359] transition-colors shadow-sm disabled:opacity-50"
-          disabled={loading}
-        >
-          {loading ? 'Menyimpan...' : 'Simpan Menu'}
-        </button>
+        <div className="flex justify-between">
+          <button 
+            type="submit" 
+            className="w-full bg-[#4CD964] text-white py-3.5 rounded-xl font-medium mt-6 hover:bg-[#44c359] transition-colors shadow-sm disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? 'Menyimpan...' : 'Simpan Menu'}
+          </button>
+          <button 
+            type="button" 
+            className="w-full bg-[#dc3545] text-white py-3.5 rounded-xl font-medium mt-6 hover:bg-[#c82333] transition-colors shadow-sm disabled:opacity-50"
+            onClick={() => navigate('/menu')}
+          >
+            Batal
+          </button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default SetupMenuPage;
+export default SetupMenu;

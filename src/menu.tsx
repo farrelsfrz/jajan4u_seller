@@ -5,7 +5,7 @@ import { Switch } from '@headlessui/react';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://384d-114-10-148-128.ngrok-free.app/menu',
+  baseURL: 'https://e1f9-103-151-226-8.ngrok-free.app/menu',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 interface MenuItem {
-  id: string;
+  menu_id: string;
   name: string;
   price: number;
   description: string;
@@ -37,6 +37,7 @@ const MenuPage: React.FC = () => {
   const fetchMenuItems = async () => {
     const seller_id = localStorage.getItem("seller_id");
     console.log("Seller ID:", seller_id);
+    console.log("Menu :", menuItems)
 
     if (!seller_id) {
       setError("Seller ID tidak ditemukan. Silakan login kembali.");
@@ -58,15 +59,15 @@ const MenuPage: React.FC = () => {
     }
   };
 
-  const handleToggleAvailability = async (id: string, currentStatus: boolean) => {
+  const handleToggleAvailability = async (menu_id, currentStatus: boolean) => {
     try {
-      await api.patch(`/menu/${id}`, {
+      await api.patch(`/menu/${menu_id}`, {
         is_available: !currentStatus
       });
       
       setMenuItems(prevItems => 
         prevItems.map(item => 
-          item.id === id ? { ...item, is_available: !currentStatus } : item
+          item.menu_id === menu_id ? { ...item, is_available: !currentStatus } : item
         )
       );
     } catch (error) {
@@ -76,10 +77,11 @@ const MenuPage: React.FC = () => {
   };
 
   const handleDeleteMenu = async (id: string) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus menu ini?')) {
+    console.log("ID:", id);
+    if (window.confirm('Apakah Anda ykin ingin menghapus menu ini?')) {
       try {
-        await api.delete(`/menu/${id}`);
-        setMenuItems(prevItems => prevItems.filter(item => item.id !== id));
+        await api.delete(`/${id}`);
+        setMenuItems(prevItems => prevItems.filter(item => item.menu_id !== id));
       } catch (error) {
         setError('Gagal menghapus menu');
         console.error('Error deleting menu:', error);
@@ -103,22 +105,27 @@ const MenuPage: React.FC = () => {
       return;
     }
   
-    if (!updatedItem.id) {
+    if (!updatedItem.menu_id) {
       setError("ID menu tidak ditemukan.");
       return;
     }
+
+    console.log("Updating menu with ID:", updatedItem.menu_id);
+    console.log("Data yang dikirim:", updatedItem);
   
     try {
-      const { id, name, price, description } = updatedItem;
-      // Pastikan URL menggunakan `id` yang benar
-      const response = await api.put(`/${id}`, { name, price, description });
+      const response = await api.put(`/${updatedItem.menu_id}`, updatedItem);
   
-      setMenuItems(items => 
-        items.map(item => 
-          item.id === updatedItem.id ? updatedItem : item
-        )
-      );
-      setShowEditPopup(false);
+      if (response.status === 200) {
+        setMenuItems(items => 
+          items.map(item => 
+            item.menu_id === updatedItem.menu_id ? updatedItem : item
+          )
+        );
+        setShowEditPopup(false);
+      } else {
+        setError('Gagal memperbarui menu');
+      }
     } catch (error) {
       setError('Gagal memperbarui menu');
       console.error('Error updating menu:', error);
@@ -160,7 +167,7 @@ const MenuPage: React.FC = () => {
                     <h3 className="font-medium text-gray-800">{item.name}</h3>
                     <p className="text-sm text-gray-500">Rp {item.price.toLocaleString()}</p>
                     <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                      {item.description}
+                      {item.id}
                     </p>
                   </div>
                   
@@ -175,7 +182,7 @@ const MenuPage: React.FC = () => {
                       
                       <button 
                         className="text-xs text-red-600 hover:text-red-700 transition-colors font-medium px-3 py-1 border border-red-600 rounded-lg hover:bg-red-50"
-                        onClick={() => handleDeleteMenu(item.id)}
+                        onClick={() => handleDeleteMenu(item.menu_id)}
                       >
                         Hapus
                       </button>
@@ -221,13 +228,15 @@ interface EditMenuPopupProps {
 
 const EditMenuPopup: React.FC<EditMenuPopupProps> = ({ menuItem, onClose, onSave }) => {
   const [name, setName] = useState(menuItem.name || "");
-  const [price, setPrice] = useState(menuItem.price || 0);
+  const [price, setPrice] = useState(menuItem.price?.toString() || "");
   const [description, setDescription] = useState(menuItem.description || "");
   const [image, setImage] = useState(menuItem.image || "");
   const [isAvailable, setIsAvailable] = useState(menuItem.is_available);
 
   const handleSave = () => {
-    if (!name || !description || isNaN(price) || price <= 0) {
+    const numericPrice = Number(price);
+    
+    if (!name || !description || isNaN(numericPrice) || numericPrice <= 0) {
       alert("Semua kolom harus diisi dengan benar, terutama harga yang harus berupa angka.");
       return;
     }
@@ -235,7 +244,7 @@ const EditMenuPopup: React.FC<EditMenuPopupProps> = ({ menuItem, onClose, onSave
     const updatedItem: MenuItem = {
       ...menuItem,
       name,
-      price,
+      price: numericPrice,
       description,
       image,
       is_available: isAvailable
@@ -258,11 +267,11 @@ const EditMenuPopup: React.FC<EditMenuPopupProps> = ({ menuItem, onClose, onSave
           />
           
           <input 
-            type="number"
+            type="text"
             placeholder="Harga"
             className="w-full p-3 border rounded-lg"
             value={price}
-            onChange={e => setPrice(Number(e.target.value))}
+            onChange={e => setPrice(e.target.value)}
           />
           
           <textarea 
